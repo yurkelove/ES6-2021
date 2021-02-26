@@ -1,68 +1,41 @@
-console.log('Request data...');
+const delay = ms => {
+    return new Promise(r => setTimeout(() => r(), ms))
+}
 
-const promise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        console.log('Preparing data...')
-        const backendDate = {
-            server: 'aws',
-            port: 2000,
-            status: 'working'
-        }
-        resolve(backendDate);
-    }, 2000)
-})
-
-// promise.then(data => {
-//     const p2 = new Promise((resolve, reject) => {
-//         setTimeout(() => {
-//             data.modified = true;
-//             resolve(data)
-//         },2000)
-//     })
-
-//     p2.then(clientData => {
-//         console.log('Data received', clientData);
-//     })
-// })
-
-// Упростим
-
-promise.then(data => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            data.modified = true;
-            // Сделаем ошибку
-            // reject(data);
-            resolve(data)
-        },2000)
-    })
-}).then(clientData => {
-    console.log('Data received', clientData);
-    clientData.fromPromise = true;
-    return clientData
-}).then(data => {
-    console.log('Modified', data)
-}).catch(err => {
-    console.error('Error:', err)
-}).finally(() => console.log('В любом случае выводится в конце'))
+delay(2000).then(() => console.log('delay'));
 
 
+const url = 'https://jsonplaceholder.typicode.com/todos';
 
-const sleep = ms => new Promise (resolve => setTimeout(() => resolve(), ms));
+// function fetchTodos() {
+//     console.log('Fetch todo started');
+//     return delay(2000).then(() => fetch(url)).then(response => response.json());
+// }
 
-sleep(2000).then(() => console.log('After 2 sec'));
-sleep(4000).then(() => console.log('After 4 sec'));
+// fetchTodos().then(data => {
+//     console.log('Data', data)
+// }).catch(e => console.error(e));
 
-// 2 возможности
 
-// Сработает только тогда когда завершаться все промисы в массиве
-Promise.all([sleep(2000), sleep(6000)])
-    .then(() => {
-        console.log('All promise working');
-    })
+// async await
+// await - должны быть асинхронные
 
-// Сработает только тогда когда завершаться первый промис
-Promise.race([sleep(2000), sleep(6000)])
-    .then(() => {
-        console.log('Race working');
-    })
+async function fetchAsyncTodos() {
+    console.log('Fetch todo started');
+    // Пока не выполниться дальше не перейдем
+    // Обработаем ошибки
+    try {
+        await delay(2000)
+        // Как результат просто в переменную получим наш response
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log('Data', data);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        console.log('В любом случае сработает');
+    }
+    
+}
+
+fetchAsyncTodos();
